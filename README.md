@@ -195,7 +195,7 @@ Rather than relying on AI as a blind generator of copy-paste code, these systems
 
 ### 🛡️ Human-in-the-Loop & Verification Principles
 * **Manual Architectural Authority:** The overall system topology, pipeline designs (such as the refined RAG flows, language routing, and evaluation architecture), and critical state-management schemas were drafted manually to guarantee absolute alignment with project specifications.
-* **Rigorous Integration & Validation:** Every pull request and integration step was manually checked, configured, and run locally. The end-to-end testing suites (`qa_evaluation_suite.py` and `ui_test_automation.py`) were manually orchestrated, reviewed, and finalized to prevent silent failures and hallucinated bugs.
+* **Rigorous Integration & Validation:** Every pull request and integration step was manually checked, configured, and run locally. Unit tests in `tests/test_refinerag.py` cover core RAG, citation, and API behavior.
 * **Security & Failure-Mode Analysis:** Sensitive endpoints, regex routines, and file handling paths were thoroughly audited manually to prevent prompt-injection vulnerabilities, validation bypasses, or systemic memory leaks.
 
 ### 📊 Tooling & Quantified Usage Log
