@@ -72,14 +72,17 @@ def run_ingestion(docs_dir: str = DOCUMENTS_DIR, db_path: str = CHROMA_DB_PATH) 
     logger.info(f"Created {len(chunks)} chunks.")
     
     try:
-        # Recreate the Chroma vector store from scratch to avoid stale data
-        # Check if DB directory exists and delete it for clean build
-        if os.path.exists(db_path):
-            import shutil
-            shutil.rmtree(db_path)
-            logger.info("Cleared existing vector store for a clean build.")
-            
         db = get_vectorstore(db_path)
+        # Clear existing documents to ensure a clean build without deleting directory
+        # which avoids WinError 32 file locking issues on Windows when server is running.
+        try:
+            existing_data = db.get()
+            if existing_data and existing_data.get("ids"):
+                db.delete(ids=existing_data["ids"])
+                logger.info("Cleared existing vector store documents for a clean build.")
+        except Exception as delete_err:
+            logger.warning(f"Could not clear vector store documents: {delete_err}")
+            
         db.add_documents(chunks)
         
         logger.info(f"Successfully ingested {len(chunks)} chunks to ChromaDB.")

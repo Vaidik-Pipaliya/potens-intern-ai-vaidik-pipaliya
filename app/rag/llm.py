@@ -1,20 +1,20 @@
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 
-def get_llm() -> ChatGoogleGenerativeAI:
+def get_llm() -> ChatGroq:
     """
-    Initializes and returns the ChatGoogleGenerativeAI LLM.
-    Requires GEMINI_API_KEY to be set in environment variables.
+    Initializes and returns the ChatGroq LLM.
+    Requires GROQ_API_KEY to be set in environment variables.
     """
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        api_key = os.environ.get("GEMINI_API_KEY")
+        api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise ValueError("GEMINI_API_KEY is not set.")
-    return ChatGoogleGenerativeAI(
-        model="gemini-3.5-flash", 
+        raise ValueError("GROQ_API_KEY is not set.")
+    return ChatGroq(
+        model="llama-3.1-8b-instant", 
         temperature=0.0, 
-        google_api_key=api_key
+        groq_api_key=api_key
     )
 
 def extract_text_from_response(content) -> str:

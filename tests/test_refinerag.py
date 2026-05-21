@@ -120,14 +120,9 @@ class TestCitationEngine(unittest.TestCase):
 
 
 class TestLanguageAndTranslation(unittest.TestCase):
-    @patch("app.utils.language_detector.get_llm")
-    def test_detect_language(self, mock_get_llm):
-        mock_llm = MagicMock()
-        mock_response = MagicMock()
-        mock_response.content = " Spanish\n"
-        mock_llm.return_value = mock_response
-        mock_llm.invoke.return_value = mock_response
-        mock_get_llm.return_value = mock_llm
+    @patch("app.utils.language_detector.detect")
+    def test_detect_language(self, mock_detect):
+        mock_detect.return_value = "es"
 
         lang = detect_language("¿Cuál es la duración?")
         self.assertEqual(lang, "Spanish")

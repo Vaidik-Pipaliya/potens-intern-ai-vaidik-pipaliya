@@ -1,37 +1,56 @@
 import logging
-from langchain_core.prompts import PromptTemplate
-from app.rag.llm import get_llm, extract_text_from_response
+from langdetect import detect
 
 logger = logging.getLogger(__name__)
 
-DETECT_LANGUAGE_PROMPT = """Analyze the following text and determine its primary language.
-Respond with ONLY the name of the language (e.g., "English", "Spanish", "French", "German", "Chinese", "Hindi", "Gujarati").
-Do not include any punctuation, explanation, or additional words.
-
-Text: {text}
-Language:"""
-
 def detect_language(text: str) -> str:
     """
-    Detects the primary language of the given text using Gemini.
+    Detects the primary language of the given text using langdetect and heuristics.
     Returns the language name (e.g., "English", "Spanish", etc.).
     """
     if not text or len(text.strip()) < 3:
         return "English"
         
+    # Check if text is Hinglish or contains typical Hinglish words or uses Hindi script.
+    # Hindi script (Devanagari) has character range \u0900-\u097f
+    if any("\u0900" <= char <= "\u097f" for char in text):
+        logger.info("Detected Devanagari script. Setting language to Hindi.")
+        return "Hindi"
+        
     try:
-        llm = get_llm()
-        prompt = PromptTemplate.from_template(DETECT_LANGUAGE_PROMPT)
-        chain = prompt | llm
+        lang_code = detect(text)
+        logger.info(f"langdetect returned code: '{lang_code}' for text: '{text[:20]}...'")
         
-        response = chain.invoke({"text": text})
-        lang = extract_text_from_response(response.content).strip().title()
+        # Map lang_code to full language name
+        mapping = {
+            "en": "English",
+            "es": "Spanish",
+            "hi": "Hindi",
+            "gu": "Gujarati",
+            "fr": "French",
+            "de": "German",
+            "zh-cn": "Chinese",
+            "zh-tw": "Chinese",
+            "it": "Italian",
+            "pt": "Portuguese",
+            "ja": "Japanese",
+            "ko": "Korean",
+            "ru": "Russian",
+        }
         
-        # Clean up any unexpected punctuation or extra text
-        lang = "".join(c for c in lang if c.isalnum() or c.isspace()).strip()
+        detected = mapping.get(lang_code, "English")
         
-        logger.info(f"Detected language for query: '{lang}'")
-        return lang
+        # Hinglish heuristic: if detected is English but has Hindi sound words,
+        # map to Hindi (to trigger query translation)
+        hinglish_words = {"ka", "ki", "ko", "ke", "hai", "hain", "aur", "kitna", "kab", "kya", "dur", "kabse", "hoga"}
+        words = set(text.lower().split())
+        if words.intersection(hinglish_words):
+            logger.info("Detected Hinglish/Hindi transliteration words. Setting language to Hindi.")
+            return "Hindi"
+            
+        logger.info(f"Detected language for query: '{detected}'")
+        return detected
     except Exception as e:
-        logger.error(f"Error detecting language: {str(e)}")
+        logger.error(f"Error detecting language with langdetect: {str(e)}")
         return "English"  # Fallback to English
+
