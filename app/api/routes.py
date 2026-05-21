@@ -12,7 +12,7 @@ def ask_question_endpoint(request: AskRequest):
     """
     try:
         # Run RAG query
-        result = query_rag(request.question)
+        result = query_rag(request.question, target_lang=request.language)
         
         # Format response to match API contract
         return AskResponse(
