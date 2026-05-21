@@ -584,14 +584,20 @@ Unlike basic chatbot RAG demos, RefineRAG focuses on:
 
 I used AI assistants throughout development similarly to a modern engineering workflow while reviewing architecture and correctness manually.
 
-| Tool | Approx Usage | Purpose |
-|---|---|---|
-| Cursor | ~35 sessions | Testing + refactors |
-| Antigravity IDE | ~120 runs | Multi-file scaffolding |
-| GitHub Copilot | ~1800 suggestions | Boilerplate + tests |
-| Gemini API | ~80 embedding batches | Production embeddings |
-| Gemini Chat | ~25 chats | Prompt experiments |
-| Groq API | ~200 inference calls | Runtime generation |
+| Tool                          | Approx. usage                                           | What I used it for                                                                                                                      |
+| ----------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Cursor (Agent + Tab)**      | ~3 agent sessions / ~15k tokens; ~80 inline completions | Refactoring support, repetitive edits, import cleanup, and portable path fixes across the codebase.                                     |
+| **Antigravity (IDE)**         | ~35 agent runs / ~180k context tokens                   | FastAPI route scaffolding, ingestion pipeline iteration, Streamlit UI improvements, and integration debugging during development.       |
+| **Claude (Sonnet)**           | ~40 messages / ~120k tokens                             | Retrieval tuning discussions, contradiction-analysis prompting, citation-grounding ideas, and LangChain debugging help.                 |
+| **ChatGPT (GPT-4o)**          | ~20 conversations / ~70k tokens                         | System design brainstorming, multilingual workflow planning, and project review before submission.                   |
+| **Google Gemini API**         | Runtime usage only                                      | Used `gemini-embedding-001` during ingestion and semantic indexing for ChromaDB vector storage.                                         |
+| **Google Gemini (AI Studio)** | ~10 chats                                               | Multilingual query testing and prompt experimentation during evaluation.                                                                |
+| **Groq API**                  | Runtime usage only                                      | Used `llama-3.1-8b-instant` for grounded Q&A generation, multilingual responses, and contradiction analysis in the running application. |
+
+### NOTE:-
+
+AI tools were used as development accelerators for brainstorming, debugging, prototyping, and repetitive tasks. Final architecture decisions, retrieval tuning, hallucination-prevention logic, integration, testing, and end-to-end validation were implemented and verified manually.
+
 
 ---
 
@@ -638,7 +644,7 @@ Built using:
 
 ---
 
-# ⭐ Final Note
+# ⭐ MY POV:
 
 RefineRAG was built not just as a chatbot, but as a trustworthy retrieval system where every answer can be traced back to evidence.
 
