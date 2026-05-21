@@ -12,7 +12,7 @@ Translation:"""
 
 def translate_text(text: str, target_language: str) -> str:
     """
-    Translates text into the target language using Gemini.
+    Translates text into the target language using the shared Groq LLM.
     """
     if not text or not target_language:
         return text
@@ -38,4 +38,4 @@ def translate_text(text: str, target_language: str) -> str:
         return translation
     except Exception as e:
         logger.error(f"Error during translation: {str(e)}")
-        return text  # Fallback to original text on failure
+        return text  # On translation failure, return source text so the pipeline still responds.

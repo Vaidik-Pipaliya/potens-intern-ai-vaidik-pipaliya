@@ -10,14 +10,15 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-CHROMA_DB_PATH = os.getenv(
-    "CHROMA_DB_PATH", 
-    "v:/PROJECTS/potens-intern-ai-vaidik-pipaliya/app/database/chroma_db"
-)
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_DEFAULT_CHROMA_PATH = os.path.join(_PROJECT_ROOT, "app", "database", "chroma_db")
+
+CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", _DEFAULT_CHROMA_PATH)
+
 
 class RateLimitedGoogleEmbeddings(GoogleGenerativeAIEmbeddings):
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        # Process in batches of 50, sleeping to avoid hitting rate limits
+        # Gemini free tier throttles burst embedding; batch + sleep avoids RESOURCE_EXHAUSTED during ingest.
         batch_size = 50
         all_embeddings = []
         for i in range(0, len(texts), batch_size):

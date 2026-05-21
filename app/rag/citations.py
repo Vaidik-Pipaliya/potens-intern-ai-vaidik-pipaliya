@@ -7,6 +7,7 @@ def split_into_sentences(text: str) -> list[str]:
     """
     # Split using punctuation boundaries followed by whitespace
     sentences = re.split(r'(?<=[.!?])\s+', text)
+    # Ignore tiny fragments ("OK.", "No.") that create false-positive substring matches.
     return [s.strip() for s in sentences if len(s.strip()) > 10]
 
 def extract_citations(answer: str, retrieved_docs: list[Document]) -> list[dict]:
@@ -27,7 +28,7 @@ def extract_citations(answer: str, retrieved_docs: list[Document]) -> list[dict]
     citations = []
     seen_citations = set()
     
-    # 1. Check if there are [Piece X] tags in the answer.
+    # Prefer [Piece N] tags from the QA prompt — maps directly to retrieval order, not fuzzy text overlap.
     has_tags = bool(re.search(r'\[Piece\s*\d+\]', answer))
     
     if has_tags:
@@ -95,8 +96,7 @@ def extract_citations(answer: str, retrieved_docs: list[Document]) -> list[dict]
                         })
                         break  # Sentence matched, move to the next sentence
                         
-    # 3. Fallback: If no strict sentence-level matching succeeded,
-    # associate with the first (most relevant) document retrieved
+    # Last resort: paraphrased answers still get a citation, but snippet may not quote the answer text.
     if not citations and retrieved_docs:
         top_doc = retrieved_docs[0]
         source = top_doc.metadata.get("source", "Unknown")

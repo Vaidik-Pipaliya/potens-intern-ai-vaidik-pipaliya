@@ -40,7 +40,7 @@ def analyze_contradiction(doc1_id: str, doc2_id: str, topic: str) -> dict:
     """
     db = get_vectorstore()
     
-    # Retrieve relevant chunks for Document 1
+    # Isolated retrieval per file — avoids mixing v1/v2 policy text in one context window.
     try:
         docs1 = db.similarity_search(topic, k=4, filter={"source": doc1_id})
     except Exception as e:
@@ -75,8 +75,7 @@ def analyze_contradiction(doc1_id: str, doc2_id: str, topic: str) -> dict:
         
         content = extract_text_from_response(response.content).strip()
         
-        # Robust parsing of JSON output
-        # Remove any leading/trailing markdown code blocks if the model ignored instructions
+        # Groq/Llama often wraps JSON in markdown fences despite the prompt — strip before json.loads.
         if content.startswith("```"):
             content = re.sub(r"^```[a-zA-Z]*\n", "", content)
             content = re.sub(r"\n```$", "", content)

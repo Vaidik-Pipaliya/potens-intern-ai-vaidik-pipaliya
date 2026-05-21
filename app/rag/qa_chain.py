@@ -18,7 +18,7 @@ def query_rag(question: str, target_lang: str = None, k: int = 4) -> dict:
     1. Detect language of the incoming question.
     2. Translate query to English if not in English.
     3. Retrieve top-k chunks from ChromaDB using English query.
-    4. Call Gemini LLM in English.
+    4. Call Groq LLM in English.
     5. Detect missing context and return fallback.
     6. Extract citations in English.
     7. Translate the final answer back to the requested or detected language.
@@ -53,7 +53,7 @@ def query_rag(question: str, target_lang: str = None, k: int = 4) -> dict:
             "raw_docs": []
         }
         
-    # Format context
+    # Piece indices in the prompt align 1:1 with retrieval order for [Piece N] citation tags.
     context_str = ""
     for idx, doc in enumerate(retrieved_docs):
         context_str += f"--- Document Piece {idx+1} ---\n{doc.page_content}\n\n"
@@ -81,10 +81,10 @@ def query_rag(question: str, target_lang: str = None, k: int = 4) -> dict:
             "raw_docs": []
         }
         
-    # Extract citations in English (matching English answer to English chunks)
+    # Citations must be resolved on the English answer before translation (chunks are English).
     citations = extract_citations(answer, retrieved_docs)
     
-    # Clean the English answer by removing all [Piece X] tags
+    # Tags are for attribution only; strip before user-facing text.
     import re
     cleaned_answer = re.sub(r'\[Piece\s*\d+\]', '', answer).strip()
     # Normalize spaces

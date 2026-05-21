@@ -40,8 +40,7 @@ def detect_language(text: str) -> str:
         
         detected = mapping.get(lang_code, "English")
         
-        # Hinglish heuristic: if detected is English but has Hindi sound words,
-        # map to Hindi (to trigger query translation)
+        # Romanized Hindi (Hinglish) often scores as English in langdetect — route to Hindi translation.
         hinglish_words = {"ka", "ki", "ko", "ke", "hai", "hain", "aur", "kitna", "kab", "kya", "dur", "kabse", "hoga"}
         words = set(text.lower().split())
         if words.intersection(hinglish_words):

@@ -8,7 +8,8 @@ from app.rag.vectorstore import get_vectorstore, CHROMA_DB_PATH
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DOCUMENTS_DIR = "v:/PROJECTS/potens-intern-ai-vaidik-pipaliya/documents"
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+DOCUMENTS_DIR = os.path.join(_PROJECT_ROOT, "documents")
 
 def load_txt_or_md(file_path: str) -> list[Document]:
     """
@@ -39,6 +40,9 @@ def load_documents_from_folder(docs_dir: str) -> list[Document]:
             continue
             
         ext = os.path.splitext(file)[1].lower()
+        # Skip folder readme so placeholder instructions are not embedded as policy text.
+        if file.lower() == "readme.md":
+            continue
         try:
             if ext == ".pdf":
                 docs = load_pdf(file_path)
@@ -73,8 +77,7 @@ def run_ingestion(docs_dir: str = DOCUMENTS_DIR, db_path: str = CHROMA_DB_PATH) 
     
     try:
         db = get_vectorstore(db_path)
-        # Clear existing documents to ensure a clean build without deleting directory
-        # which avoids WinError 32 file locking issues on Windows when server is running.
+        # Delete collection rows in-place (not the persist folder) to avoid WinError 32 when uvicorn holds DB files.
         try:
             existing_data = db.get()
             if existing_data and existing_data.get("ids"):

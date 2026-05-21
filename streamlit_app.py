@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 # Load env variables
 load_dotenv()
 
-# Setup paths
-DOCUMENTS_DIR = "v:/PROJECTS/potens-intern-ai-vaidik-pipaliya/documents"
-CHROMA_DB_PATH = "v:/PROJECTS/potens-intern-ai-vaidik-pipaliya/app/database/chroma_db"
+_PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+DOCUMENTS_DIR = os.path.join(_PROJECT_ROOT, "documents")
+CHROMA_DB_PATH = os.path.join(_PROJECT_ROOT, "app", "database", "chroma_db")
 API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000/api")
 
 # Try importing backend directly for standalone runtime support

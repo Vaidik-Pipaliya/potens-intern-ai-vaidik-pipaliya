@@ -19,7 +19,7 @@ def split_documents(documents: list[Document], chunk_size: int = 1000, chunk_ove
     
     chunks = splitter.split_documents(documents)
     
-    # Enrich metadata with unique chunk identifiers
+    # chunk_id is global per ingest run (not per file) — sufficient for take-home citation display.
     for idx, chunk in enumerate(chunks):
         chunk.metadata["chunk_id"] = idx
         

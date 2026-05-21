@@ -1,6 +1,6 @@
 from langchain_core.prompts import PromptTemplate
 
-# Prompt template enforcing strict no-hallucination and no-guessing rules
+# [Piece N] tags bridge LLM output to citations.py without trusting model-generated page numbers.
 QA_PROMPT_TEMPLATE = """You are a precise, document-based question-answering assistant.
 Your task is to answer the user's question using ONLY the provided context below.
 

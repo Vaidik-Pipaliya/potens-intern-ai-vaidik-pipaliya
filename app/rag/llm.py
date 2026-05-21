@@ -18,10 +18,7 @@ def get_llm() -> ChatGroq:
     )
 
 def extract_text_from_response(content) -> str:
-    """
-    Safely extracts string content from LLM response content.
-    Handles string, list of dicts, or other formats returned by the Google GenAI SDK.
-    """
+    """Normalize Groq/Gemini response.content whether it is a str or a list of parts."""
     if isinstance(content, str):
         return content
     if isinstance(content, list):
