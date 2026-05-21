@@ -5,6 +5,8 @@ from langchain_core.documents import Document
 from app.rag.vectorstore import get_vectorstore
 from app.rag.prompts import QA_PROMPT
 
+from app.rag.citations import extract_citations
+
 logger = logging.getLogger(__name__)
 
 def get_llm() -> ChatGoogleGenerativeAI:
@@ -74,9 +76,12 @@ def query_rag(question: str, k: int = 4) -> dict:
             "raw_docs": []
         }
         
+    # Extract actual citations matching the answer sentences to retrieved chunks
+    citations = extract_citations(answer, retrieved_docs)
+    
     return {
         "answer": answer,
-        "citations": [], # Citation formatting will be implemented in Phase 6
-        "confidence": 0.85, # Basic confidence for now
+        "citations": citations,
+        "confidence": 0.9, # Static confidence score for core RAG answers
         "raw_docs": retrieved_docs
     }
