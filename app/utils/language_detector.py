@@ -1,6 +1,6 @@
 import logging
 from langchain_core.prompts import PromptTemplate
-from app.rag.llm import get_llm
+from app.rag.llm import get_llm, extract_text_from_response
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def detect_language(text: str) -> str:
         chain = prompt | llm
         
         response = chain.invoke({"text": text})
-        lang = response.content.strip().title()
+        lang = extract_text_from_response(response.content).strip().title()
         
         # Clean up any unexpected punctuation or extra text
         lang = "".join(c for c in lang if c.isalnum() or c.isspace()).strip()

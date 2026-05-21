@@ -6,7 +6,7 @@ from app.rag.prompts import QA_PROMPT
 from app.rag.citations import extract_citations
 from app.utils.language_detector import detect_language
 from app.utils.translator import translate_text
-from app.rag.llm import get_llm
+from app.rag.llm import get_llm, extract_text_from_response
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ def query_rag(question: str, target_lang: str = None, k: int = 4) -> dict:
             "question": eng_question
         })
         
-        answer = response.content.strip()
+        answer = extract_text_from_response(response.content).strip()
     except Exception as e:
         logger.error(f"LLM generation error: {str(e)}")
         answer = "Not found in the provided documents."

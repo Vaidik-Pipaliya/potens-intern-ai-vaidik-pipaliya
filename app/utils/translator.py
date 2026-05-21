@@ -1,6 +1,6 @@
 import logging
 from langchain_core.prompts import PromptTemplate
-from app.rag.llm import get_llm
+from app.rag.llm import get_llm, extract_text_from_response
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def translate_text(text: str, target_language: str) -> str:
             "target_language": target_language
         })
         
-        translation = response.content.strip()
+        translation = extract_text_from_response(response.content).strip()
         logger.info(f"Successfully translated text to {target_language}")
         return translation
     except Exception as e:

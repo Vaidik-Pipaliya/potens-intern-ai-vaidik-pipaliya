@@ -3,7 +3,7 @@ import re
 import logging
 from langchain_core.prompts import PromptTemplate
 from app.rag.vectorstore import get_vectorstore
-from app.rag.qa_chain import get_llm
+from app.rag.llm import get_llm, extract_text_from_response
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ def analyze_contradiction(doc1_id: str, doc2_id: str, topic: str) -> dict:
             "doc2_context": doc2_context
         })
         
-        content = response.content.strip()
+        content = extract_text_from_response(response.content).strip()
         
         # Robust parsing of JSON output
         # Remove any leading/trailing markdown code blocks if the model ignored instructions
