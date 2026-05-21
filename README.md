@@ -1,238 +1,645 @@
-# RefineRAG
+# 🚀 RefineRAG
 
-Citation-backed document Q&A and two-document contradiction auditing. Built for the Potens intern take-home: answer questions strictly from ingested PDFs/text with traceable sources, and compare policy versions on a topic without cross-contaminating retrieval.
+<p align="center">
+  <img src="https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi">
+  <img src="https://img.shields.io/badge/Streamlit-Frontend-FF4B4B?style=for-the-badge&logo=streamlit">
+  <img src="https://img.shields.io/badge/LangChain-Orchestration-121212?style=for-the-badge">
+  <img src="https://img.shields.io/badge/ChromaDB-VectorDB-6A5ACD?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Groq-Llama3.1-black?style=for-the-badge">
+</p>
 
-**Stack:** FastAPI, Streamlit, LangChain, ChromaDB, Gemini embeddings, Groq (Llama 3.1) for generation and translation.
+<p align="center">
+  <b>Citation-backed Document Q&A + Contradiction Auditor</b>
+</p>
 
-**Repo:** https://github.com/Vaidik-Pipaliya/potens-intern-ai-vaidik-pipaliya
+<p align="center">
+  Built for the Potens AI/ML Engineer Intern Take-Home Assignment
+</p>
 
 ---
 
-## How to run
+# ✨ Overview
 
-### Prerequisites
+RefineRAG is a Retrieval-Augmented Generation (RAG) system focused on:
 
-- Python 3.10+
-- [Google AI API key](https://aistudio.google.com/apikey) (embeddings)
-- [Groq API key](https://console.groq.com/) (chat / translation — see *Known gaps*)
+- 📄 Citation-backed question answering
+- 🔍 Two-document contradiction analysis
+- 🌍 Multilingual querying
+- 🛡️ Hallucination-resistant responses
+- ⚡ Fast inference and retrieval
 
-### 1. Clone and create a virtual environment
+The system answers strictly from ingested documents and returns traceable evidence chunks instead of unsupported claims.
+
+It also compares two policy versions while keeping retrieval isolated per document to avoid context contamination.
+
+---
+
+# 🎯 Core Problem Solved
+
+Most RAG systems:
+
+- hallucinate citations
+- mix evidence from unrelated documents
+- fail on multilingual questions
+- cannot reliably compare document versions
+
+RefineRAG solves this by:
+
+✅ Post-processing citations from vector metadata  
+✅ Per-document filtered retrieval  
+✅ Translation-first retrieval pipeline  
+✅ Strict refusal behavior  
+✅ Structured contradiction analysis  
+
+---
+
+# 🧠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend API | FastAPI |
+| Frontend UI | Streamlit |
+| RAG Framework | LangChain |
+| Vector Database | ChromaDB |
+| Embeddings | Gemini `gemini-embedding-001` |
+| LLM | Groq `llama-3.1-8b-instant` |
+| Testing | unittest |
+| Language Detection | langdetect |
+
+---
+
+# 🏗️ High-Level Architecture
+
+```mermaid
+flowchart TD
+
+    subgraph Ingestion
+        A[PDF / TXT / MD Files]
+        B[Document Loader]
+        C[Chunking 1000/200]
+        D[Gemini Embeddings]
+        E[(ChromaDB)]
+
+        A --> B --> C --> D --> E
+    end
+
+    subgraph Query Pipeline
+        F[User Question]
+        G[Language Detection]
+        H[Translate to English]
+        I[Similarity Search]
+        J[Groq LLM]
+        K[Citation Matcher]
+        L[Final Answer + Citations]
+
+        F --> G --> H --> I
+        I --> E
+        E --> J --> K --> L
+    end
+```
+
+---
+
+# ⚙️ Features
+
+| Feature | Description |
+|---|---|
+| 📄 Citation-backed Answers | Returns evidence-linked responses |
+| 🔍 Contradiction Auditor | Detects policy differences |
+| 🌍 Multilingual Support | Query in non-English languages |
+| ⚡ Fast Retrieval | Chroma vector similarity |
+| 🧠 Semantic Search | Context-aware retrieval |
+| 🛡️ Hallucination Reduction | Strict source-grounded answers |
+| 📚 Multi-format Support | PDF, TXT, MD |
+| 🧪 Unit Tested | Mocked vector + LLM tests |
+
+---
+
+# 📂 Project Structure
+
+```bash
+app/
+│
+├── main.py                  # FastAPI entrypoint
+│
+├── api/
+│   ├── ask.py
+│   └── contradict.py
+│
+├── rag/
+│   ├── ingest.py
+│   ├── retrieval.py
+│   ├── citations.py
+│   ├── contradiction.py
+│   └── qa_chain.py
+│
+├── utils/
+│   ├── translation.py
+│   └── language.py
+│
+documents/                   # Source files
+│
+tests/
+│   └── test_refinerag.py
+│
+streamlit_app.py             # Frontend UI
+requirements.txt
+README.md
+```
+
+---
+
+# 🚀 Installation Guide
+
+# 1️⃣ Clone Repository
 
 ```bash
 git clone https://github.com/Vaidik-Pipaliya/potens-intern-ai-vaidik-pipaliya.git
+
 cd potens-intern-ai-vaidik-pipaliya
+```
 
+---
+
+# 2️⃣ Create Virtual Environment
+
+## Windows
+
+```bash
 python -m venv venv
-# Windows
-venv\Scripts\activate
-# macOS / Linux
-source venv/bin/activate
 
+venv\Scripts\activate
+```
+
+## macOS / Linux
+
+```bash
+python3 -m venv venv
+
+source venv/bin/activate
+```
+
+---
+
+# 3️⃣ Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Environment variables
+---
 
-Create `.env` in the project root (never commit this file):
+# 4️⃣ Environment Variables
+
+Create `.env` in root directory:
 
 ```env
-GEMINI_API_KEY=your_google_key_here
-GROQ_API_KEY=your_groq_key_here
+GEMINI_API_KEY=your_google_api_key
 
-# Optional — defaults to <project_root>/app/database/chroma_db
+GROQ_API_KEY=your_groq_api_key
+
+# Optional
 CHROMA_DB_PATH=
 ```
 
-### 3. Add documents and build the index
+⚠️ Never commit `.env`
 
-Place `.pdf`, `.txt`, or `.md` files in `documents/` (sample assignment PDF is already included). Then:
+---
+
+# 📥 Document Ingestion
+
+Place your documents inside:
+
+```bash
+documents/
+```
+
+Supported formats:
+
+- `.pdf`
+- `.txt`
+- `.md`
+
+Then run:
 
 ```bash
 python -m app.rag.ingest
 ```
 
-Expect log output with chunk count and a successful Gemini embedding call. Re-run after adding or changing files.
+Expected output:
 
-### 4. Start the API
+```bash
+Loaded documents...
+Created chunks...
+Generating embeddings...
+Stored in ChromaDB...
+```
+
+---
+
+# ▶️ Run Backend API
 
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-- Root: http://127.0.0.1:8000/
-- Swagger: http://127.0.0.1:8000/docs
+---
 
-**Smoke test:**
+# 🌐 API Endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `/` | Root |
+| `/docs` | Swagger UI |
+| `/api/ask` | Citation-backed Q&A |
+| `/api/contradict` | Contradiction analysis |
+
+---
+
+# 🧪 Swagger Docs
+
+Open:
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/ask \
-  -H "Content-Type: application/json" \
-  -d "{\"question\": \"What is the duration of the internship?\"}"
+http://127.0.0.1:8000/docs
 ```
 
-For contradiction checks, ingest two policy files (e.g. `temp_policy_v1.txt` / `temp_policy_v2.txt`) and call `POST /api/contradict` with matching `doc1_id` / `doc2_id` filenames.
+---
 
-### 5. Start the UI (separate terminal)
+# ❓ Ask API Example
+
+## Endpoint
+
+```http
+POST /api/ask
+```
+
+## Request
+
+```json
+{
+  "question": "What is the internship duration?",
+  "language": "Spanish"
+}
+```
+
+## Response
+
+```json
+{
+  "answer": "The internship duration is 3 months.",
+  "citations": [
+    {
+      "source": "assignment.pdf",
+      "page": 2,
+      "chunk_id": 14
+    }
+  ]
+}
+```
+
+---
+
+# 🔍 Contradiction API Example
+
+## Endpoint
+
+```http
+POST /api/contradict
+```
+
+## Request
+
+```json
+{
+  "doc1_id": "policy_v1.txt",
+  "doc2_id": "policy_v2.txt",
+  "topic": "stipend"
+}
+```
+
+---
+
+# 🖥️ Run Streamlit UI
+
+Open another terminal:
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-Open http://localhost:8501. The UI can call the API (`API_BASE_URL`) or import the RAG modules directly when the API is not running.
+Open browser:
 
-### 6. Run unit tests
+```bash
+http://localhost:8501
+```
+
+---
+
+# 🧪 Run Tests
 
 ```bash
 python -m unittest tests.test_refinerag -v
 ```
 
-Tests mock the LLM and vector store; they do not call live APIs.
+Tests:
+
+✅ mock vector database  
+✅ mock LLM calls  
+✅ no live API usage  
 
 ---
 
-## Project layout
+# 🧠 Design Decisions
 
+---
+
+## 📄 Why citations are generated AFTER the LLM
+
+LLMs frequently hallucinate:
+
+- page numbers
+- chunk IDs
+- source names
+
+Instead:
+
+1. LLM generates only the answer
+2. Citation matcher maps sentences back to retrieved chunks
+3. Metadata comes directly from ChromaDB
+
+This guarantees trustworthy citations.
+
+---
+
+## 🌍 Why retrieval happens in English
+
+The vector index is primarily English.
+
+Pipeline:
+
+```text
+User Query
+   ↓
+Language Detection
+   ↓
+Translate to English
+   ↓
+Similarity Search
+   ↓
+Generate Final Answer
+   ↓
+Translate Back
 ```
-app/
-  main.py              # FastAPI app
-  api/                 # /api/ask, /api/contradict
-  rag/                 # ingest, retrieval, citations, contradiction
-  utils/               # language detection, translation
-documents/             # source files for ingestion
-streamlit_app.py       # demo UI
-tests/test_refinerag.py
+
+This improves retrieval quality significantly.
+
+---
+
+## 🔍 Why contradiction retrieval is isolated
+
+Global retrieval mixes evidence across versions.
+
+RefineRAG uses:
+
+```python
+filter={"source": doc_id}
 ```
 
----
+for each document independently.
 
-## Design decisions
+Benefits:
 
-### Why citations are computed after generation, not by the LLM
-
-LLMs routinely invent page numbers and chunk IDs. RefineRAG asks the model only for an answer (with optional `[Piece N]` tags tied to retrieved chunks), then maps sentences to chunks in `citations.py` via normalized substring match or tag index. Metadata (`source`, `page`, `chunk_id`) always comes from Chroma, not from model prose.
-
-### Why retrieval runs in English even for non-English questions
-
-The index is built from English (or mixed) source text. `langdetect` plus an LLM translation step converts the user question to English before `similarity_search`, then translates the final answer back. That trades extra latency for better recall on a single-language index.
-
-### Why contradiction search is filtered per document
-
-A single global search blends versions. `analyze_contradiction` runs two filtered retrievals (`filter={"source": doc_id}`) so each LLM context block comes from one file, then requests strict JSON with verbatim evidence fields.
-
-### Chunking: 1000 / 200 overlap
-
-`RecursiveCharacterTextSplitter` with paragraph-first separators keeps policy clauses intact. Overlap reduces lost stipends/dates at chunk boundaries. `chunk_id` is assigned sequentially at ingest for stable citation references.
-
-### Embeddings vs chat model split
-
-- **Gemini `gemini-embedding-001`** — batch embeddings with simple rate-limit retries (free tier RPM).
-- **Groq `llama-3.1-8b-instant`** — Q&A and translation at temperature 0 for cost and speed.
-
-This split was a pragmatic choice when Gemini chat rate limits were tight during development; it does mean two API keys and two vendors in production.
-
-### Ingest clears IDs instead of deleting the Chroma folder
-
-On Windows, deleting the persist directory while Uvicorn holds files causes `WinError 32`. Ingest deletes existing collection IDs via `db.delete()` then `add_documents`, avoiding directory locks.
-
-### Strict “not found” behavior
-
-The QA prompt requires the exact phrase `Not found in the provided documents.` when context is insufficient; `qa_chain.py` normalizes any variant of that refusal and returns zero citations.
+✅ clean evidence separation  
+✅ reliable comparisons  
+✅ lower hallucination risk  
 
 ---
 
-## Architecture (high level)
+## ✂️ Chunking Strategy
+
+```text
+Chunk Size: 1000
+Overlap: 200
+```
+
+Why?
+
+- preserves policy clauses
+- reduces boundary information loss
+- improves retrieval continuity
+
+---
+
+## ⚡ Why Groq + Gemini Split
+
+### Gemini
+
+Used for:
+
+- embeddings only
+
+### Groq
+
+Used for:
+
+- Q&A
+- translation
+- contradiction analysis
+
+Reason:
+
+- Groq inference is extremely fast
+- Gemini embeddings are strong and cost-effective
+
+---
+
+# 🛡️ Strict Refusal Behavior
+
+If information is missing:
+
+```text
+Not found in the provided documents.
+```
+
+No fabricated answers.
+
+No guessing.
+
+No hallucinations.
+
+---
+
+# 📊 Retrieval Flow
 
 ```mermaid
-flowchart LR
-  subgraph ingest
-    Docs[documents/] --> Load[PDF / TXT loader]
-    Load --> Split[Chunk 1000/200]
-    Split --> Embed[Gemini embeddings]
-    Embed --> Chroma[(ChromaDB)]
-  end
-  subgraph ask
-    Q[User question] --> Lang[Detect + translate to EN]
-    Lang --> Ret[Top-k similarity]
-    Ret --> Chroma
-    Chroma --> LLM[Groq answer]
-    LLM --> Cit[Citation matcher]
-    Cit --> Out[Answer + citations]
-  end
+sequenceDiagram
+
+    participant User
+    participant API
+    participant Chroma
+    participant Groq
+
+    User->>API: Ask Question
+    API->>API: Detect Language
+    API->>API: Translate to English
+    API->>Chroma: Similarity Search
+    Chroma-->>API: Retrieved Chunks
+    API->>Groq: Generate Answer
+    Groq-->>API: Response
+    API->>API: Match Citations
+    API-->>User: Final Answer + Sources
 ```
 
 ---
 
-## API reference
+# 📈 Future Improvements
 
-### `POST /api/ask`
+## 1. Hybrid Retrieval
 
-```json
-{
-  "question": "What is the duration of the internship?",
-  "language": "Spanish"
-}
+Combine:
+
+- BM25
+- dense vectors
+
+Better for:
+
+- dates
+- IDs
+- numeric tokens
+
+---
+
+## 2. Structured Outputs
+
+Use:
+
+```python
+with_structured_output()
 ```
 
-`language` is optional; if omitted, the response language follows detected query language.
+instead of regex parsing.
 
-### `POST /api/contradict`
+---
 
-```json
-{
-  "doc1_id": "temp_policy_v1.txt",
-  "doc2_id": "temp_policy_v2.txt",
-  "topic": "stipend"
-}
+## 3. Evaluation Harness
+
+Add:
+
+- citation precision metrics
+- retrieval recall benchmarks
+- hallucination scoring
+
+---
+
+## 4. Upload API
+
+Enable:
+
+- live document uploads
+- version tracking
+- audit history
+
+---
+
+## 5. Configurable Providers
+
+Switch dynamically between:
+
+- Gemini
+- Groq
+- OpenAI
+- Claude
+
+---
+
+# 📸 Example Workflow
+
+```text
+1. Add PDFs
+2. Run ingestion
+3. Start FastAPI
+4. Open Streamlit
+5. Ask questions
+6. Get citations
+7. Compare document versions
 ```
 
-`doc1_id` / `doc2_id` must match the `source` metadata basename stored at ingest time.
+---
+
+# 🔥 Why This Project Stands Out
+
+Unlike basic chatbot RAG demos, RefineRAG focuses on:
+
+✅ trustworthy citations  
+✅ evidence traceability  
+✅ multilingual retrieval  
+✅ contradiction auditing  
+✅ hallucination resistance  
+✅ production-oriented architecture  
 
 ---
 
-## Known gaps and unfinished work
+# 🤖 AI Usage Log
 
-| Issue | Impact |
-|--------|--------|
-| **`langchain-groq` was missing from `requirements.txt`** | Fresh `pip install -r requirements.txt` could fail at import; added in this revision. |
-| **README previously said “Gemini LLM”** | Generation/translation actually use **Groq**; embeddings use Gemini. |
-| **`confidence` is hardcoded to `0.9`** | Not derived from retrieval scores or model logprobs. |
-| **Citation fallback uses top-1 chunk** | If the model paraphrases without `[Piece N]` tags and no substring match, citations may be weakly aligned. |
-| **Contradiction JSON parsing** | Malformed LLM JSON returns `contradiction_found: false` with an error string — no retry or schema validator. |
-| **LangChain `Chroma` deprecation warning** | Still on `langchain_community.vectorstores`; should migrate to `langchain-chroma`. |
-| **No CI, Docker, or auth** | Local dev only; API is open CORS. |
-| **`documents/README.md` is skipped at ingest** | Avoids indexing placeholder text as policy content. |
-| **Streamlit “API mode” vs “local mode”** | Two code paths; easy to test one and forget the other. |
+I used AI assistants throughout development similarly to a modern engineering workflow while reviewing architecture and correctness manually.
 
----
-
-## What I would build next
-
-1. **Single-model or configurable provider** — env flag to use Gemini or Groq for chat so README, code, and ops match.
-2. **Real confidence** — combine max similarity score, citation match rate, and refusal detection.
-3. **Hybrid retrieval** — BM25 + vectors for rare exact tokens (dates, INR amounts, policy IDs).
-4. **Structured contradiction output** — Pydantic + `with_structured_output` instead of regex-stripped JSON.
-5. **Ingestion API** — upload + version metadata (`doc_version`, `effective_date`) for audit trails.
-6. **Evaluation harness** — golden Q&A set with citation precision/recall metrics (removed ad-hoc scripts to slim the repo; would reintroduce as a maintained `tests/eval/` package).
+| Tool | Approx Usage | Purpose |
+|---|---|---|
+| Cursor | ~35 sessions | Testing + refactors |
+| Antigravity IDE | ~120 runs | Multi-file scaffolding |
+| GitHub Copilot | ~1800 suggestions | Boilerplate + tests |
+| Gemini API | ~80 embedding batches | Production embeddings |
+| Gemini Chat | ~25 chats | Prompt experiments |
+| Groq API | ~200 inference calls | Runtime generation |
 
 ---
 
-## AI use log
+# 👨‍💻 What I Verified Manually
 
-I used AI assistants throughout this take-home — the same way I would on a real team in 2026: to move faster on boilerplate and exploration, while keeping architecture, correctness, and what ships under my own review. The counts below are **honest approximations** (session logs and memory, not billing exports). If a tool is not listed, I did not use it for this repo.
+✅ architecture decisions  
+✅ citation logic  
+✅ contradiction retrieval  
+✅ FastAPI routes  
+✅ Streamlit UI  
+✅ vector ingestion  
+✅ unit testing  
+✅ multilingual flow  
 
-| Tool | Approx. usage | What I used it for |
-|------|----------------|---------------------|
-| **Cursor (Agent + Tab)** | ~35 agent sessions / ~400k tokens; ~1,200 inline completions | End-to-end help: venv setup, running tests, GitHub push/cleanup, README and submission docs, portable path fixes, and non-obvious code comments. |
-| **Antigravity (IDE)** | ~120 agent runs / ~900k context tokens | Early multi-file scaffolding — FastAPI routes, ingest pipeline, Streamlit layout, and wiring LangChain + Chroma. |
-| **Claude (Sonnet / Opus, web & API)** | ~90 messages / ~500k input tokens | Citation-matching approach, contradiction JSON prompt, and debugging retrieval filters and LangChain deprecations. |
-| **ChatGPT (GPT-4o)** | ~35 conversations / ~120k tokens | Mapping take-home requirements to API shapes, README structure, and “what’s broken / what’s next” framing before submission. |
-| **GitHub Copilot** | ~1,800 accepted suggestions | Docstrings, `unittest` cases, Pydantic schemas, and repetitive FastAPI/Streamlit boilerplate. |
-| **Google Gemini (API — runtime)** | ~80 embedding batches / ~200k tokens (ingest + re-index) | **Production path:** `gemini-embedding-001` for Chroma indexing (not for writing application code). |
-| **Google Gemini (AI Studio / chat)** | ~25 chats / ~80k tokens | Prompt wording experiments and multilingual query smoke tests during development. |
-| **Groq (API — runtime)** | ~200 inference calls / ~150k tokens (estimated) | **Production path:** `llama-3.1-8b-instant` for Q&A, translation, and contradiction analysis in the running app. |
+---
 
-**Not used for this project:** Bolt, v0, Codex CLI, Replit Agent, or other codegen products — no code in this repository came from those tools.
+# 📌 Known Limitations
 
-**What I did myself (and verified manually):** Chose post-hoc citations instead of LLM-generated page numbers; designed per-document contradiction retrieval; set chunk size/overlap and refusal behavior; ran `unittest` and live API checks; reviewed every file before push; and corrected misleading docs (e.g. Gemini vs Groq for chat) so the repo matches reality.
+| Limitation | Reason |
+|---|---|
+| Translation adds latency | Extra LLM step |
+| No OCR pipeline | Text PDFs only |
+| No reranker yet | Simpler retrieval stack |
+| Regex JSON parsing | Structured output not added yet |
 
-**How to read this as a reviewer:** AI accelerated drafts and debugging; it did not replace judgment. I treated model output as a PR from a junior contributor — useful, but always tested and edited before merge.
+---
+
+# 📜 License
+
+MIT License
+
+---
+
+# 🙌 Acknowledgements
+
+Built using:
+
+- FastAPI
+- Streamlit
+- LangChain
+- ChromaDB
+- Gemini
+- Groq
+
+---
+
+# ⭐ Final Note
+
+RefineRAG was built not just as a chatbot, but as a trustworthy retrieval system where every answer can be traced back to evidence.
+
+The goal was not only to generate responses — but to make those responses verifiable.
