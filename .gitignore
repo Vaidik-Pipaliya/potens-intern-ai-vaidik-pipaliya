@@ -1,6 +1,22 @@
-venv/
+# Python bytecode and cache
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environments and Virtual environments
 .env
-*.log
-data/
-backend/db/
+.venv
+venv/
+ENV/
+
+# Database storage
+app/database/
+
+# Streamlit temporary config
+.streamlit/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
