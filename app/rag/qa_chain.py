@@ -1,29 +1,16 @@
 import os
 import logging
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.documents import Document
 from app.rag.vectorstore import get_vectorstore
 from app.rag.prompts import QA_PROMPT
 from app.rag.citations import extract_citations
 from app.utils.language_detector import detect_language
 from app.utils.translator import translate_text
+from app.rag.llm import get_llm
 
 logger = logging.getLogger(__name__)
 
-def get_llm() -> ChatGoogleGenerativeAI:
-    """
-    Initializes and returns the ChatGoogleGenerativeAI LLM.
-    """
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY is not set.")
-    return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash", 
-        temperature=0.0, 
-        google_api_key=api_key
-    )
+
 
 def query_rag(question: str, target_lang: str = None, k: int = 4) -> dict:
     """

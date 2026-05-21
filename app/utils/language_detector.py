@@ -1,6 +1,6 @@
 import logging
 from langchain_core.prompts import PromptTemplate
-from app.rag.qa_chain import get_llm
+from app.rag.llm import get_llm
 
 logger = logging.getLogger(__name__)
 
