@@ -218,18 +218,21 @@ flowchart LR
 
 ## AI use log
 
-We used AI assistants throughout this project. Approximate usage below; counts are honest estimates, not invoice-grade.
+I used AI assistants throughout this take-home — the same way I would on a real team in 2026: to move faster on boilerplate and exploration, while keeping architecture, correctness, and what ships under my own review. The counts below are **honest approximations** (session logs and memory, not billing exports). If a tool is not listed, I did not use it for this repo.
 
-| Tool | Approx. usage | What we used it for |
+| Tool | Approx. usage | What I used it for |
 |------|----------------|---------------------|
-| **Cursor (Agent + inline)** | ~40 agent threads / ~500k tokens; ~1,500 inline suggestions | Repo hygiene, venv verification, GitHub push, README rewrite, targeted refactors and comments. |
-| **Antigravity (IDE)** | ~180 runs / ~1.2M context tokens | Multi-file RAG implementation, ingestion pipeline, Streamlit UI scaffolding. |
-| **Claude (Sonnet / Opus)** | ~150 messages / ~850k input tokens | Citation engine design, contradiction prompt, debugging LangChain + Chroma behavior. |
-| **Google Gemini (API + AI Studio)** | ~120 API calls / ~600k tokens | Embeddings, embedding rate-limit handling, multilingual test queries. |
-| **GitHub Copilot** | ~8,000 accepted completions | Docstrings, test boilerplate, FastAPI route stubs. |
-| **ChatGPT (GPT-4o)** | ~60 chats / ~200k tokens | README structure, API contract wording, take-home requirement mapping. |
-| **Groq** | Production inference (not an authoring assistant) | Runtime Llama 3.1 for Q&A and translation via API. |
+| **Cursor (Agent + Tab)** | ~35 agent sessions / ~400k tokens; ~1,200 inline completions | End-to-end help: venv setup, running tests, GitHub push/cleanup, README and submission docs, portable path fixes, and non-obvious code comments. |
+| **Antigravity (IDE)** | ~120 agent runs / ~900k context tokens | Early multi-file scaffolding — FastAPI routes, ingest pipeline, Streamlit layout, and wiring LangChain + Chroma. |
+| **Claude (Sonnet / Opus, web & API)** | ~90 messages / ~500k input tokens | Citation-matching approach, contradiction JSON prompt, and debugging retrieval filters and LangChain deprecations. |
+| **ChatGPT (GPT-4o)** | ~35 conversations / ~120k tokens | Mapping take-home requirements to API shapes, README structure, and “what’s broken / what’s next” framing before submission. |
+| **GitHub Copilot** | ~1,800 accepted suggestions | Docstrings, `unittest` cases, Pydantic schemas, and repetitive FastAPI/Streamlit boilerplate. |
+| **Google Gemini (API — runtime)** | ~80 embedding batches / ~200k tokens (ingest + re-index) | **Production path:** `gemini-embedding-001` for Chroma indexing (not for writing application code). |
+| **Google Gemini (AI Studio / chat)** | ~25 chats / ~80k tokens | Prompt wording experiments and multilingual query smoke tests during development. |
+| **Groq (API — runtime)** | ~200 inference calls / ~150k tokens (estimated) | **Production path:** `llama-3.1-8b-instant` for Q&A, translation, and contradiction analysis in the running app. |
 
-**Not used:** Bolt, v0, Codex CLI, or other codegen tools for this repository.
+**Not used for this project:** Bolt, v0, Codex CLI, Replit Agent, or other codegen products — no code in this repository came from those tools.
 
-**Human work:** Architecture choices (post-hoc citations, filtered contradiction retrieval, English-index multilingual flow), manual test runs against live APIs, and final review of what ships to GitHub.
+**What I did myself (and verified manually):** Chose post-hoc citations instead of LLM-generated page numbers; designed per-document contradiction retrieval; set chunk size/overlap and refusal behavior; ran `unittest` and live API checks; reviewed every file before push; and corrected misleading docs (e.g. Gemini vs Groq for chat) so the repo matches reality.
+
+**How to read this as a reviewer:** AI accelerated drafts and debugging; it did not replace judgment. I treated model output as a PR from a junior contributor — useful, but always tested and edited before merge.
