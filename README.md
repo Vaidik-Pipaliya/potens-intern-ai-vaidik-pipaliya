@@ -173,19 +173,6 @@ Audits two files on a target topic to detect contradictions.
 
 ---
 
-## 🎙️ 2-Minute Tech Lead Explanation
-
-> "We built **RefineRAG** to address the two biggest vulnerabilities in RAG deployments: **hallucinated citation metrics** and **cross-document factual contradictions** during document versioning.
->
-> **How we solved Citation Integrity:**
-> Rather than trusting the LLM to output accurate page numbers or chunk IDs (which LLMs frequently hallucinate or confuse under pressure), we decoupling retrieval from citation mapping. The LLM generates the text answering the query based strictly on the provided context. Then, our post-generation citation engine splits the answer into individual sentences and performs a normalized, case-insensitive substring alignment check against the retrieved source chunks. This guarantees that any returned page number, filename, or snippet is a 100% factual match back to the vector store index.
->
-> **How we solved Contradiction Auditing:**
-> When contrasting document versions (like a policy update), general RAG often mixes different parts of documents together. We isolate comparisons by performing two independent vector searches: one filtered specifically to Document 1 and another to Document 2 using Chroma's metadata filters. We present these distinct contexts to Gemini with a constrained JSON output schema. The model acts as a pure comparison logic gate, outputting a structured boolean evaluation alongside verbatim evidence blocks, ensuring perfect version-control clarity.
->
-> **Multilingual support** is achieved through bidirectional routing: queries are detected and translated to English to maximize search alignment against the English index, and responses are translated back to the query language while preserving the original English verification snippets."
-
----
 
 ## 🤖 AI Assistance & Transparent Attribution Log
 
