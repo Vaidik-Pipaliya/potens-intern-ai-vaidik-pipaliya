@@ -84,10 +84,18 @@ def query_rag(question: str, target_lang: str = None, k: int = 4) -> dict:
     # Extract citations in English (matching English answer to English chunks)
     citations = extract_citations(answer, retrieved_docs)
     
+    # Clean the English answer by removing all [Piece X] tags
+    import re
+    cleaned_answer = re.sub(r'\[Piece\s*\d+\]', '', answer).strip()
+    # Normalize spaces
+    cleaned_answer = re.sub(r'\s+', ' ', cleaned_answer)
+    # Remove space before punctuation (e.g. "focused day ." -> "focused day.")
+    cleaned_answer = re.sub(r'\s+([.,!?])', r'\1', cleaned_answer)
+    
     # Translate the English answer to the final response language if needed
-    final_answer = answer
+    final_answer = cleaned_answer
     if response_lang.lower() not in ["english", "en"]:
-        final_answer = translate_text(answer, response_lang)
+        final_answer = translate_text(cleaned_answer, response_lang)
         logger.info(f"Translated final answer to {response_lang}")
         
     return {

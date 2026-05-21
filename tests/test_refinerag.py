@@ -85,6 +85,25 @@ class TestCitationEngine(unittest.TestCase):
         self.assertEqual(citations[0]["chunk_id"], 1)
         self.assertEqual(citations[0]["snippet"], "The internship duration is six months.")
 
+    def test_extract_citations_tag_based(self):
+        retrieved_docs = [
+            Document(page_content="The internship duration is six months.", metadata={"source": "policy.pdf", "page": 1, "chunk_id": 1}),
+            Document(page_content="Interns receive a stipend of $500 monthly.", metadata={"source": "policy.pdf", "page": 2, "chunk_id": 2})
+        ]
+        answer = "The internship is short [Piece 1]. Interns receive pay [Piece 2]."
+        citations = extract_citations(answer, retrieved_docs)
+        
+        self.assertEqual(len(citations), 2)
+        self.assertEqual(citations[0]["file"], "policy.pdf")
+        self.assertEqual(citations[0]["page"], 1)
+        self.assertEqual(citations[0]["chunk_id"], 1)
+        self.assertEqual(citations[0]["snippet"], "The internship is short.")
+        
+        self.assertEqual(citations[1]["file"], "policy.pdf")
+        self.assertEqual(citations[1]["page"], 2)
+        self.assertEqual(citations[1]["chunk_id"], 2)
+        self.assertEqual(citations[1]["snippet"], "Interns receive pay.")
+
     def test_extract_citations_fallback(self):
         retrieved_docs = [
             Document(page_content="The internship duration is six months.", metadata={"source": "policy.pdf", "page": 1, "chunk_id": 1})
