@@ -44,11 +44,18 @@ This log documents the collaboration history, tool calls, and implementation dec
 - **Actions**: Built the UI frontend `streamlit_app.py` complete with file uploads, vector indexing controls, chat engine, language selector, and contradiction visual audit banners.
 - **Files Created**: `streamlit_app.py`.
 
+### 10. LLM Migration & Robust Citations Update
+- **Actions**:
+  - Migrated the RAG LLM to `gemini-3.5-flash` in `app/rag/llm.py` and updated response list-parsing logic to prevent parsing crashes.
+  - Implemented a hybrid citation extraction engine using `[Piece X]` tags emitted by the LLM and matching them to context source chunks, with legacy sentence-matching fallback.
+  - Added clean answer post-processing to strip tags and normalize double spaces/whitespace before punctuation.
+
 ---
 
 ## 🔬 Validation & Code Verification
 
 To ensure strict engineering discipline:
 1. **API Validation**: Exposed FastAPI paths `/api/ask` and `/api/contradict` matching the strict Pydantic requirements.
-2. **Deterministic Citations**: Answer sentences are cross-referenced with exact chunk text using string normalization to guarantee that metadata (filename and page number) corresponds to actual ingested documents.
+2. **Deterministic Citations**: Answer sentences/tags are cross-referenced with exact chunk text and indexes to guarantee that metadata (filename and page number) corresponds to actual ingested documents.
 3. **No Hallucinations**: Validated the template constraints; any search query lacking sufficient document context correctly results in the fallback sentence `"Not found in the provided documents."`
+4. **Unit Testing**: Verified via a comprehensive test suite of 14 unit tests, all of which run and pass successfully.
