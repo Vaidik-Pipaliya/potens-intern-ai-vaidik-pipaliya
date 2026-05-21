@@ -15,3 +15,15 @@ class AskResponse(BaseModel):
     answer: str = Field(..., description="Generated answer from documents")
     citations: List[Citation] = Field(default=[], description="List of source citations used to form the answer")
     confidence: float = Field(..., description="Confidence score between 0.0 and 1.0")
+
+class ContradictRequest(BaseModel):
+    doc1_id: str = Field(..., description="Filename of the first document to compare")
+    doc2_id: str = Field(..., description="Filename of the second document to compare")
+    topic: str = Field(..., description="The topic/key to check for contradictions")
+
+class ContradictResponse(BaseModel):
+    contradiction_found: bool = Field(..., description="True if a contradiction is detected between the documents")
+    reasoning: str = Field(..., description="Detailed explanation of the contradiction or lack thereof")
+    evidence_doc1: str = Field(..., description="Relevant snippet from Document 1")
+    evidence_doc2: str = Field(..., description="Relevant snippet from Document 2")
+
